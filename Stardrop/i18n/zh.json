@@ -57,6 +57,7 @@
   "ui.main_window.menu_headers.last_updated": "上次更新时间",
   "ui.main_window.menu_headers.notes": "备注",
   "ui.main_window.menu_headers.link": "链接",
+  "ui.main_window.menu_headers.changelog": "更新日志",
 
   // Main Window - Labels
   "ui.main_window.labels.profile": "配置方案",
@@ -70,6 +71,7 @@
 
   // Main Window - Hyperlinks
   "ui.main_window.hyperlinks.click_to_open": "点击打开",
+  "ui.main_window.hyperlinks.view_changelog": "查看",
   "ui.main_window.hyperlinks.update_available": "可用更新（{0}）",
   "ui.main_window.hyperlinks.unofficial_update_available": "非官方可用更新（{0}）",
   "ui.main_window.hyperlinks.update_ignored": "更新被忽略（{0}）",
@@ -125,6 +127,7 @@
   "ui.settings_window.labels.smapi_path": "SMAPI 路径",
   "ui.settings_window.labels.mod_path": "模组文件夹路径",
   "ui.settings_window.labels.mod_install": "Stardrop 已安装模组路径",
+  "ui.settings_window.labels.collection_install": "合集已安装模组路径",
   "ui.settings_window.labels.themes": "主题",
   "ui.settings_window.labels.languages": "语言",
   "ui.settings_window.labels.grouping": "模组分类规则",
@@ -147,6 +150,7 @@
   "ui.settings_window.tooltips.smapi": "StardewModdingAPI 文件路径",
   "ui.settings_window.tooltips.mod_folder_path": "模组文件夹路径",
   "ui.settings_window.tooltips.mod_install_path": "Stardrop 存放新安装模组的文件夹路径必须位于“模组文件夹路径”给定的文件夹下",
+  "ui.settings_window.tooltips.collection_install_path": "合集安装的模组将存放于此路径。该路径必须位于“模组文件夹路径”之外，因为合集需要为所锁定的每个模组安装其独立的副本。更改此路径不会移动已安装的模组。",
   "ui.settings_window.tooltips.theme": "Stardrop 当前使用的主题",
   "ui.settings_window.tooltips.language": "Stardrop 当前使用的语言",
   "ui.settings_window.tooltips.grouping": "当前对模组分类的规则",
@@ -192,7 +196,12 @@
 
   // Warnings
   "ui.warning.unable_to_add_profile": "无法添加{0}，已经存在同名的配置方案！",
+  "ui.warning.no_mods_to_change": "没有可更改的模组\n\n“启用所有模组”和“禁用所有模组”仅影响当前显示的模组",
   "ui.warning.given_mod_folder_does_not_exist": "给定模组文件夹路径不存在\n\n恢复到之前的路径",
+  "ui.warning.given_collection_folder_does_not_exist": "给定的合集已安装模组路径不存在。\n\n恢复到之前的路径",
+  "ui.warning.given_collection_folder_conflicts_with_mod_folder": "合集已安装模组路径不能位于{0}之内，{0}也不能位于该路径之内\n\n合集会为所锁定的每个模组安装其独立的副本。若两者路径重叠，在 Stardrop 之外启动 SMAPI 时，每个模组都会显示两份副本，而 SMAPI 会跳过所有重复唯一 ID 的副本，而不会只选用其中一个\n\n恢复到之前的路径",
+  "ui.warning.given_collection_folder_reserved": "合集已安装模组路径不能位于 Stardrop 自行管理的文件夹内，因为安装在该处的任何内容都将被清除\n\n恢复到之前的路径",
+  "ui.warning.collection_folder_changed": "您的合集已安装模组路径已更改\n\nStardrop 不会自动为您移动模组。请将\n\n{0}\n\n中的所有内容移动到\n\n{1}\n\n然后使用“文件 > 刷新模组列表”。在您完成此操作之前，已安装的合集将无法被识别，且对启用状态的任何更改都会导致相关模组从使用了它们的合集配置方案中移除。",
   "ui.warning.given_install_folder_not_exist": "给定 Stardrop 已安装模组文件夹路径不存在\n\n恢复到之前的路径",
   "ui.warning.given_install_folder_not_exist_default": "给定 Stardrop 已安装模组文件夹路径不存在\n\n恢复到之前的路径",
   "ui.warning.given_install_folder_not_under_mod_folder": "给定 Stardrop 已安装模组文件夹路径不存在于{0}\n\n恢复到之前的路径",
@@ -201,6 +210,9 @@
   "ui.warning.stardrop_downloading": "正在下载最新版本的 Stardrop",
   "ui.warning.SMAPI_downloading": "正在从 GitHub 下载最新版本的 SMAPI",
   "ui.warning.SMAPI_installing": "正在更新 SMAPI 到最新版本",
+  "ui.warning.mod_update_scanning": "正在扫描模组文件夹，检查变更……",
+  "ui.warning.mod_update_checking": "正在通过 smapi.io 检查模组更新……",
+  "ui.warning.mod_update_applying": "正在标记模组更新……",
   "ui.warning.SMAPI_up_to_date": "SMAPI 已经是最新版本\n\n最新版本号为: {0}",
   "ui.warning.install_mod_attempt_count": "正在尝试安装{0}个模组",
   "ui.warning.mod_installing": "正在安装: {0}",
@@ -228,6 +240,7 @@
   "ui.warning.no_downloads_available": "目前在 Nexus Mods 上没有可更新的模组",
   "ui.warning.failed_nexus_install": "由于与 Nexus Mods 的连接问题，{0}安装失败\n\n请重试",
   "ui.warning.unable_nexus_install": "无法安装模组: {0}",
+  "ui.warning.unable_nexus_changelog": "无法获取模组 {0} 的更新日志。",
   "ui.warning.unable_to_endorse": "无法设置签名状态: \n\n{0}",
   "ui.warning.mod_owned": "您是这个模组的所有者",
   "ui.warning.too_soon_after_download": "在下载这个模组后，您必须等待15分钟\n\n尝试签名将重置计时器",
@@ -236,6 +249,7 @@
   "ui.warning.failed_to_get_download_link": "无法从 Nexus Mods 获取下载链接: {0}",
   "ui.warning.failed_to_set_association": "Stardrop 与 NXM 关联失败\n\n更多内容请查看日志",
   "ui.warning.already_associated": "Stardrop 已经与 NXM 协议关联",
+  "ui.warning.nxm_association_overridden": "NXM 链接当前由 {0} 处理，而非 Stardrop。\n\nWindows 会保护此项选择，因此 Stardrop 无法代您更改。请依次打开“设置 > 应用 > 默认应用 > 按协议选择默认应用”，搜索 NXM，然后将其设置为 Stardrop。\n\n您也可以通过删除以下注册表项来清除此选择：\n\nHKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\Shell\\Associations\\UrlAssociations\\nxm",
   "ui.warning.unsupported_platform": "NXM 协议暂时只支持 Windows",
   "ui.warning.failed_to_verify_mod_file": "未能验证 Nexus Mods 文件扫描结果。是否继续下载？",
   "ui.warning.file_quarantined": "无法下载模组：\n\n该文件已被隔离。",
@@ -269,6 +283,12 @@
   "ui.window.nexus_login_actual.name": "Nexus Mods API 密钥",
   "ui.window.nexus_user.name": "Nexus Mods 用户信息",
   "ui.window.missing_mods.name": "缺失模组",
+  "ui.window.changelog.name": "更新日志",
+  "ui.window.changelog.title": "更新日志：{0}",
+  "ui.window.changelog.none_published": "该模组未在 Nexus Mods 上发布更新日志。",
+  "ui.window.changelog.fetch_failed": "无法从 Nexus Mods 获取更新日志。",
+  "ui.window.changelog.view_on_nexus": "查看历史更新日志",
+  "ui.window.changelog.view_on_nexus_tooltip": "在 Nexus Mods 上打开该模组的页面，以查看完整的更新日志历史。",
 
   // Internals
   "internal.connected": "已连接",
