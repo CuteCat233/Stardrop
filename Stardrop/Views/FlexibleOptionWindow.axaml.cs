@@ -18,10 +18,6 @@ namespace Stardrop.Views
             // Set the main window view
             _viewModel = new FlexibleOptionWindowViewModel();
             DataContext = _viewModel;
-
-#if DEBUG
-            this.AttachDevTools();
-#endif
         }
 
         public FlexibleOptionWindow(string messageText, string? firstButtonText = null, string? secondButtonText = null, string? thirdButtonText = null, double? windowWidth = null) : this()

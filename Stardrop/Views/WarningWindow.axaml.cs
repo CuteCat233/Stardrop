@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
@@ -29,10 +29,6 @@ namespace Stardrop.Views
 
             this.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             this.SizeToContent = SizeToContent.Height;
-
-#if DEBUG
-            this.AttachDevTools();
-#endif
         }
 
         /// <summary>

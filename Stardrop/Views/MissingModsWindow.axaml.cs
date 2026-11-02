@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform.Storage;
 using Stardrop.Models;
 using Stardrop.Utilities;
 using Stardrop.ViewModels;
@@ -45,7 +46,7 @@ namespace Stardrop.Views
         private void OnDragOver(object? sender, DragEventArgs e)
         {
             // Only accept the drop if it actually contains files
-            e.DragEffects = e.Data.Contains(DataFormats.FileNames) ? DragDropEffects.Copy : DragDropEffects.None;
+            e.DragEffects = e.DataTransfer.Contains(DataFormat.File) ? DragDropEffects.Copy : DragDropEffects.None;
         }
 
         private async void OnDrop(object? sender, DragEventArgs e)
@@ -55,12 +56,16 @@ namespace Stardrop.Views
                 return;
             }
 
-            if (!e.Data.Contains(DataFormats.FileNames))
+            if (e.DataTransfer.Contains(DataFormat.File) is false)
             {
                 return;
             }
 
-            var files = e.Data.GetFileNames();
+            var files = e.DataTransfer.TryGetFiles()?
+                .Select(file => file.TryGetLocalPath())
+                .Where(path => String.IsNullOrEmpty(path) is false)
+                .Cast<string>()
+                .ToList();
             if (files is not null && DataContext is MissingModsWindowViewModel viewModel)
             {
                 foreach (var path in files)

@@ -17,9 +17,6 @@ namespace Stardrop.Views
         public ProfileNaming()
         {
             InitializeComponent();
-#if DEBUG
-            this.AttachDevTools();
-#endif
         }
 
         public ProfileNaming(ProfileEditorViewModel parentView, Profile? renameTarget = null) : this()

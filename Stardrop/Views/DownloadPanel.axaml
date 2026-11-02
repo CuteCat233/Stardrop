@@ -1,11 +1,11 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              xmlns:sys="using:System"
              xmlns:scg="using:System.Collections.Generic"
-             xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+             xmlns:i="using:Stardrop.Controls"
              xmlns:vm="using:Stardrop.ViewModels"
              xmlns:conv="using:Stardrop.Converters"
              xmlns:i18n="using:Stardrop.Utilities.Extension"
@@ -53,14 +53,16 @@
                        VerticalAlignment="Center"
                        Text="{i18n:Translate ui.downloads_panel.no_downloads_label}"
                        IsVisible="{Binding !Downloads.Count}"/>
-            <ItemsRepeater x:Name="DownloadItems" 
-                           Items="{Binding Downloads}"
-                           Margin="0 12 0 12"
-                           IsVisible="{Binding !!Downloads.Count}">
-                <ItemsRepeater.Layout>
-                    <StackLayout Spacing="24"/>
-                </ItemsRepeater.Layout>                
-                <ItemsRepeater.ItemTemplate>
+            <ItemsControl x:Name="DownloadItems"
+                          ItemsSource="{Binding Downloads}"
+                          Margin="0 12 0 12"
+                          IsVisible="{Binding !!Downloads.Count}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Spacing="24"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="vm:ModDownloadViewModel">
                         <!--Each of the Classes.className variables is a boolean. The converter checks the current DownloadStatus and sets
                         the appropriate Classes.className to 'True', which then causes the style to kick in and fill in the UI with one of the 
@@ -76,8 +78,8 @@
                                         Classes.failed="{Binding DownloadStatus, Converter={StaticResource EnumEqualsConverter}, 
                                             ConverterParameter={x:Static vm:ModDownloadStatus.Failed}}"/>
                     </DataTemplate>
-                </ItemsRepeater.ItemTemplate>
-                <ItemsRepeater.Styles>
+                </ItemsControl.ItemTemplate>
+                <ItemsControl.Styles>
                     <!--UI for not-yet-started download-->
                     <Style Selector="ContentControl.notStarted">
                         <Setter Property="Content" Value="{x:Null}"/>
@@ -265,8 +267,8 @@
                             </Template>
                         </Setter>
                     </Style>
-                </ItemsRepeater.Styles>
-            </ItemsRepeater>
+                </ItemsControl.Styles>
+            </ItemsControl>
         </Grid>
     </ScrollViewer>    
     

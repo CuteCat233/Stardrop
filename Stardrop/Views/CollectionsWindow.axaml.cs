@@ -1,8 +1,9 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform.Storage;
 using Stardrop.Models;
 using Stardrop.Models.Data.Enums;
 using Stardrop.Utilities;
@@ -37,10 +38,6 @@ namespace Stardrop.Views
         public CollectionsWindow()
         {
             InitializeComponent();
-
-#if DEBUG
-            this.AttachDevTools();
-#endif
 
             DataContext = _viewModel;
 
@@ -125,12 +122,16 @@ namespace Stardrop.Views
         /// </summary>
         private async void OnFilesDropped(object? sender, DragEventArgs e)
         {
-            if (_onFilesDropped is null || e.Data.Contains(DataFormats.FileNames) is false)
+            if (_onFilesDropped is null || e.DataTransfer.Contains(DataFormat.File) is false)
             {
                 return;
             }
 
-            var filePaths = e.Data.GetFileNames()?.ToArray();
+            var filePaths = e.DataTransfer.TryGetFiles()?
+                .Select(file => file.TryGetLocalPath())
+                .Where(path => String.IsNullOrEmpty(path) is false)
+                .Cast<string>()
+                .ToArray();
             if (filePaths is null || filePaths.Length == 0)
             {
                 return;
@@ -143,7 +144,7 @@ namespace Stardrop.Views
 
         private void OnFilesDraggedOver(object? sender, DragEventArgs e)
         {
-            e.DragEffects = _onFilesDropped is not null && e.Data.Contains(DataFormats.FileNames) ? DragDropEffects.Copy : DragDropEffects.None;
+            e.DragEffects = _onFilesDropped is not null && e.DataTransfer.Contains(DataFormat.File) ? DragDropEffects.Copy : DragDropEffects.None;
         }
 
         /// <summary>

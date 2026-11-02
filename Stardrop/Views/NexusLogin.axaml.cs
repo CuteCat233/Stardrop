@@ -16,10 +16,6 @@ namespace Stardrop.Views
         {
             InitializeComponent();
             _nexusWebsocket = new NexusWebsocket();
-
-#if DEBUG
-            this.AttachDevTools();
-#endif
         }
 
         public NexusLogin(MainWindowViewModel viewModel) : this()

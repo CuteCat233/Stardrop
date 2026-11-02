@@ -1,4 +1,4 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using System;
@@ -84,7 +84,7 @@ namespace Stardrop.Utilities.Internal
             foreach (var key in defaults.Resources.Keys.ToList())
             {
                 // A theme may declare resources at the Styles level or inside a child Style, so ask the theme as a whole
-                if (((IResourceProvider)theme).TryGetResource(key, out _))
+                if (((IResourceProvider)theme).TryGetResource(key, null, out _))
                 {
                     continue;
                 }

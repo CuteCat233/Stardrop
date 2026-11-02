@@ -1,12 +1,15 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<Version>1.10.4</Version>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 		<ApplicationIcon>Assets\icon.ico</ApplicationIcon>
+		<!-- Avalonia 12 enables compiled bindings by default; this project relies on reflection
+		     bindings and has no x:DataType declarations, so keep the previous behaviour. -->
+		<AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
 	</PropertyGroup>
 	<PropertyGroup>
 		<PublishSingleFile>true</PublishSingleFile>
@@ -37,18 +40,14 @@
 	  <Content Include="Themes\Contributors\hotcereal\Light Cherry Chocolate.xaml" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Avalonia" Version="0.10.22" />
-		<PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.22" />
-		<PackageReference Include="Avalonia.Desktop" Version="0.10.22" />
-		<!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-		<PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.22" />
-		<PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="0.10.22" />
-		<PackageReference Include="Avalonia.ReactiveUI" Version="0.10.22" />
+		<PackageReference Include="Avalonia" Version="12.1.4" />
+		<PackageReference Include="Avalonia.Controls.DataGrid" Version="12.1.2" />
+		<PackageReference Include="Avalonia.Desktop" Version="12.1.4" />
+		<PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="12.1.4" />
+		<PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.4" />
 		<PackageReference Include="CommandLineParser" Version="2.9.1" />
 		<PackageReference Include="Json.More.Net" Version="2.0.1" />
-		<PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
-		<PackageReference Include="Projektanker.Icons.Avalonia" Version="5.13.0" />
-		<PackageReference Include="Projektanker.Icons.Avalonia.MaterialDesign" Version="5.13.0" />
+		<PackageReference Include="ReactiveUI" Version="13.2.10" />
 		<PackageReference Include="semver" Version="2.3.0" />
 		<PackageReference Include="SharpCompress" Version="0.48.1" />
 	</ItemGroup>

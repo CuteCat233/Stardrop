@@ -1,11 +1,11 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Stardrop.ViewModels"
         xmlns:view="using:Stardrop.Views"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:sys="clr-namespace:System;assembly=netstandard"
-        xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+        xmlns:i="using:Stardrop.Controls"
         xmlns:conv="clr-namespace:Stardrop.Converters;assembly=Stardrop"
 		xmlns:i18n="clr-namespace:Stardrop.Utilities.Extension"
 		xmlns:ext="clr-namespace:Stardrop.Utilities.Extension"
@@ -17,9 +17,8 @@
         Width="1430"
         Height="800"
         Background="{DynamicResource ThemeBackgroundBrush}"
-        HasSystemDecorations="{Binding HasSystemDecorations}"
+        WindowDecorations="{Binding WindowDecorations}"
         ExtendClientAreaToDecorationsHint="true"
-        ExtendClientAreaChromeHints="{Binding ChromeHint}"
         ExtendClientAreaTitleBarHeightHint="-1"
         CanResize="True"
         Opened="MainWindow_Opened"
@@ -96,9 +95,7 @@
 										CornerRadius="{DynamicResource OverlayCornerRadius}">
 									<ScrollViewer Classes="menuscroller">
 										<ItemsPresenter Name="PART_ItemsPresenter"
-														Items="{TemplateBinding Items}"
 														ItemsPanel="{TemplateBinding ItemsPanel}"
-														ItemTemplate="{TemplateBinding ItemTemplate}"
 														Margin="{DynamicResource MenuFlyoutScrollerMargin}"
 														Grid.IsSharedSizeScope="True" />
 									</ScrollViewer>
@@ -232,10 +229,7 @@
 									<ScrollViewer HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
 												  VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
 										<ItemsPresenter Name="PART_ItemsPresenter"
-														Items="{TemplateBinding Items}"
-														ItemsPanel="{TemplateBinding ItemsPanel}"
-														ItemTemplate="{TemplateBinding ItemTemplate}"
-														VirtualizationMode="{TemplateBinding VirtualizationMode}" />
+														ItemsPanel="{TemplateBinding ItemsPanel}" />
 									</ScrollViewer>
 								</Border>
 							</Popup>
@@ -324,6 +318,9 @@
 		<Style Selector="TextBox:not(:focus)">
 			<Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
 			<Setter Property="Background" Value="{DynamicResource ThemeBackgroundBrush}"/>
+		</Style>
+		<Style Selector="TextBox.notes">
+			<Setter Property="FontFamily" Value="Microsoft YaHei, PingFang SC, SimSun, Noto Sans CJK SC"/>
 		</Style>
 		<Style Selector="TextBox.notes:focus /template/ Border">
 			<Setter Property="Background" Value="Transparent"/>
@@ -497,7 +494,7 @@
 		</DockPanel>
 
 		<Border Name="dragOverBorder" Margin="10" DragDrop.AllowDrop="True" Grid.Row="3" Grid.ColumnSpan="2" BorderBrush="{DynamicResource HighlightBrush}" BorderThickness="2">
-			<DataGrid Name="modGrid" Foreground="{DynamicResource DataGridRowForeground}" Background="{DynamicResource DataGridRowBackground}" AlternatingRowBackground="{DynamicResource AlternativeDataGridRowBackground}" CanUserSortColumns="True" CanUserResizeColumns="True" CanUserReorderColumns="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+			<DataGrid Name="modGrid" Foreground="{DynamicResource DataGridRowForeground}" Background="{DynamicResource DataGridRowBackground}" CanUserSortColumns="True" CanUserResizeColumns="True" CanUserReorderColumns="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
 				<DataGrid.Resources>
 					<ContextMenu x:Key="GridColumnContextMenu" Name="gridColumnContextMenu" DataContext="{Binding $parent[DataGrid].DataContext}">
 						<MenuItem Header="{i18n:Translate ui.main_window.menu_items.context.columns.show_hide}" />
@@ -594,7 +591,7 @@
 					<DataGridTemplateColumn ext:ColumnExtensions.Key="Requirements" Header="{i18n:Translate ui.main_window.menu_headers.requirements}" IsVisible="False" SortMemberPath="HardRequirements.Count" CellStyleClasses="centered">
 						<DataGridTemplateColumn.CellTemplate>
 							<DataTemplate>
-								<ListBox Items="{Binding HardRequirements}" Background="Transparent">
+								<ListBox ItemsSource="{Binding HardRequirements}" Background="Transparent">
 									<ListBox.ItemTemplate>
 										<DataTemplate>
 											<TextBlock Text="{Binding Path=Name}" Foreground="{DynamicResource DataGridRowForeground}" />
@@ -607,7 +604,7 @@
 					<DataGridTemplateColumn ext:ColumnExtensions.Key="MissingRequirements" Header="{i18n:Translate ui.main_window.menu_headers.missing_requirements}" SortMemberPath="MissingRequirements.Count" CellStyleClasses="centered">
 						<DataGridTemplateColumn.CellTemplate>
 							<DataTemplate>
-								<ListBox Items="{Binding MissingRequirements}" Background="Transparent">
+								<ListBox ItemsSource="{Binding MissingRequirements}" Background="Transparent">
 									<ListBox.ItemTemplate>
 										<DataTemplate>
 											<Button Content="{Binding Path=Name}" Classes="hyperlink" Command="{Binding $parent[DataGrid].DataContext.OpenBrowser}" CommandParameter="{Binding GenericLink}" Foreground="{DynamicResource HighlightForegroundBrush}"/>
@@ -658,7 +655,7 @@
 			</DataGrid>
 		</Border>
 		<DockPanel Name="filterBar" Grid.Row="4" Grid.Column="0" Margin="7 0 0 5">
-			<TextBox Name="searchBox" Watermark="{i18n:Translate ui.main_window.labels.filter}" Height="10" Width="250" BorderBrush="{DynamicResource HighlightBrush}" HorizontalAlignment="Left"/>
+			<TextBox Name="searchBox" PlaceholderText="{i18n:Translate ui.main_window.labels.filter}" Height="10" Width="250" BorderBrush="{DynamicResource HighlightBrush}" HorizontalAlignment="Left"/>
 			<Button Name="searchFilterColumnButton" Content="{i18n:Translate ui.main_window.buttons.no_search_filters}" VerticalAlignment="Center" Margin="5 0 0 0" Foreground="{DynamicResource ThemeForegroundBrush}" Background="Transparent" BorderBrush="{DynamicResource HighlightBrush}">
 				<Button.Flyout>
 					<Flyout FlyoutPresenterClasses="FilterBoxFlyout">

@@ -1,9 +1,9 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Stardrop.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+        xmlns:i="using:Stardrop.Controls"
 		xmlns:i18n="clr-namespace:Stardrop.Utilities.Extension"
         mc:Ignorable="d" d:DesignWidth="430" d:DesignHeight="650"
         x:Class="Stardrop.Views.SettingsWindow"
@@ -12,9 +12,8 @@
         MinHeight="430"
         Width="430"
         Background="{DynamicResource ThemeBackgroundBrush}"
-        HasSystemDecorations="true"
+        WindowDecorations="BorderOnly"
         ExtendClientAreaToDecorationsHint="true"
-        ExtendClientAreaChromeHints="NoChrome"
         ExtendClientAreaTitleBarHeightHint="-1"
         CanResize="True"
         Icon="/Assets/icon.ico">
@@ -115,10 +114,7 @@
 									<ScrollViewer HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
 												  VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
 										<ItemsPresenter Name="PART_ItemsPresenter"
-														Items="{TemplateBinding Items}"
-														ItemsPanel="{TemplateBinding ItemsPanel}"
-														ItemTemplate="{TemplateBinding ItemTemplate}"
-														VirtualizationMode="{TemplateBinding VirtualizationMode}" />
+														ItemsPanel="{TemplateBinding ItemsPanel}" />
 									</ScrollViewer>
 								</Border>
 							</Popup>

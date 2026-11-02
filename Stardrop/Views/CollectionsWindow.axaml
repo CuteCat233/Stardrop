@@ -3,7 +3,7 @@
         xmlns:vm="using:Stardrop.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+        xmlns:i="using:Stardrop.Controls"
 		xmlns:i18n="clr-namespace:Stardrop.Utilities.Extension"
         mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="560"
         x:Class="Stardrop.Views.CollectionsWindow"
@@ -13,9 +13,8 @@
         Width="900"
         Height="560"
         Background="{DynamicResource ThemeBackgroundBrush}"
-        HasSystemDecorations="true"
+        WindowDecorations="BorderOnly"
         ExtendClientAreaToDecorationsHint="true"
-        ExtendClientAreaChromeHints="NoChrome"
         ExtendClientAreaTitleBarHeightHint="-1"
         CanResize="True"
         Icon="/Assets/icon.ico">
@@ -132,7 +131,7 @@
 			</Grid.ColumnDefinitions>
 
 			<Border Grid.Column="0" BorderBrush="{DynamicResource HighlightBrush}" BorderThickness="2">
-				<ListBox Name="collectionList" Items="{Binding Collections}" SelectedItem="{Binding SelectedCollection}" Background="{DynamicResource DataGridRowBackground}">
+				<ListBox Name="collectionList" ItemsSource="{Binding Collections}" SelectedItem="{Binding SelectedCollection}" Background="{DynamicResource DataGridRowBackground}">
 					<ListBox.ItemTemplate>
 						<DataTemplate>
 							<StackPanel Margin="0 2 0 2">
@@ -182,7 +181,7 @@
 					<TextBlock DockPanel.Dock="Bottom" Classes="subtle" Margin="0 2 0 0" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" Text="{i18n:Translate ui.collections_window.textblock.drop_entry_hint}" />
 					<TextBlock DockPanel.Dock="Bottom" Classes="subtle" Margin="0 6 0 0" HorizontalAlignment="Center" Text="{i18n:Translate ui.collections_window.textblock.open_entry_hint}" />
 
-					<ListBox Name="entryList" Items="{Binding Entries}">
+					<ListBox Name="entryList" ItemsSource="{Binding Entries}">
 						<ListBox.ItemTemplate>
 							<DataTemplate>
 								<Grid ColumnDefinitions="1.4* 0.5* 1.6*" Background="Transparent" DoubleTapped="OnEntryDoubleTapped">

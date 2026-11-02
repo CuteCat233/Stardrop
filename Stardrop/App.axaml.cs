@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Stardrop
 {
@@ -47,14 +48,6 @@ namespace Stardrop
             Current.Styles.Insert(ThemeManager.THEME_STYLE_INDEX, !themes.ContainsKey(Program.settings.Theme) ? themes.Values.First() : themes[Program.settings.Theme]);
         }
 
-        private async void OnUrlsOpen(object? sender, UrlOpenedEventArgs e, MainWindow mainWindow)
-        {
-            foreach (string? url in e.Urls.Where(u => String.IsNullOrEmpty(u) is false))
-            {
-                await mainWindow.ProcessNXMLink(new NXM() { Link = url, Timestamp = DateTime.Now });
-            }
-        }
-
         public override void OnFrameworkInitializationCompleted()
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
@@ -62,11 +55,33 @@ namespace Stardrop
                 var mainWindow = new MainWindow();
                 desktop.MainWindow = mainWindow;
 
-                // Register events
-                this.UrlsOpened += (sender, e) => OnUrlsOpen(sender, e, mainWindow);
+                // Avalonia 12 replaced Application.UrlsOpened with the activatable application lifetime,
+                // which reports protocol activations (such as nxm:// links) as ProtocolActivatedEventArgs.
+                if (this.TryGetFeature<IActivatableLifetime>() is { } activatableLifetime)
+                {
+                    activatableLifetime.Activated += (sender, e) =>
+                    {
+                        if (e is ProtocolActivatedEventArgs protocolActivatedEventArgs && String.Equals(protocolActivatedEventArgs.Uri.Scheme, "nxm", StringComparison.OrdinalIgnoreCase))
+                        {
+                            _ = OpenNxmLinkAsync(mainWindow, protocolActivatedEventArgs.Uri.AbsoluteUri);
+                        }
+                    };
+                }
             }
 
             base.OnFrameworkInitializationCompleted();
+        }
+
+        private static async Task OpenNxmLinkAsync(MainWindow mainWindow, string url)
+        {
+            try
+            {
+                await mainWindow.ProcessNXMLink(new NXM() { Link = url, Timestamp = DateTime.Now });
+            }
+            catch (Exception ex)
+            {
+                Program.helper.Log($"Failed to process the opened NXM link [{url}]: {ex}", Helper.Status.Warning);
+            }
         }
     }
 }

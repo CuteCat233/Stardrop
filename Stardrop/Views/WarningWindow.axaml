@@ -3,7 +3,7 @@
         xmlns:vm="using:Stardrop.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+        xmlns:i="using:Stardrop.Controls"
         mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="150"
         x:Class="Stardrop.Views.WarningWindow"
         Title="Warning"
@@ -12,7 +12,7 @@
         Width="{Binding WindowWidth}"
         Height="150"
         Background="{DynamicResource ThemeBackgroundBrush}"
-        HasSystemDecorations="false"
+        WindowDecorations="None"
         Icon="/Assets/icon.ico">
 
 	<Window.Styles>
@@ -72,12 +72,12 @@
 					<Panel>
 						<TextBlock IsVisible="{Binding !IsRichTextVisible}" Text="{Binding WarningText}" TextWrapping="Wrap" Foreground="{DynamicResource ThemeForegroundBrush}" HorizontalAlignment="{Binding MessageHorizontalAlignment}" TextAlignment="{Binding MessageTextAlignment}"/>
 						<!--The segment based display, used when the message may contain links. Avalonia 0.10 has no inline runs, so each line is laid out as its own wrapping panel of words-->
-						<ItemsControl IsVisible="{Binding IsRichTextVisible}" Items="{Binding WarningLines}">
+						<ItemsControl IsVisible="{Binding IsRichTextVisible}" ItemsSource="{Binding WarningLines}">
 							<ItemsControl.ItemTemplate>
 								<DataTemplate>
 									<Grid ColumnDefinitions="Auto,*">
 										<Border Grid.Column="0" Width="{Binding IndentWidth}"/>
-										<ItemsControl Grid.Column="1" Items="{Binding Segments}">
+										<ItemsControl Grid.Column="1" ItemsSource="{Binding Segments}">
 											<ItemsControl.ItemsPanel>
 												<ItemsPanelTemplate>
 													<WrapPanel Orientation="Horizontal"/>

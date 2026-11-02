@@ -1,9 +1,10 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using DynamicData;
 using DynamicData.Binding;
@@ -85,8 +86,17 @@ namespace Stardrop.Views
             // SMAPI_MODS_PATH is set via the profile dropdown on the UI
             var modGrid = this.FindControl<DataGrid>("modGrid");
             modGrid.IsReadOnly = true;
-            modGrid.LoadingRow += (sender, e) => { e.Row.Header = e.Row.GetIndex() + 1; };
-            modGrid.Items = _viewModel.DataView;
+            modGrid.LoadingRow += (sender, e) =>
+            {
+                e.Row.Header = e.Row.Index + 1;
+
+                // DataGrid 11+ no longer has AlternatingRowBackground, so shade every other row here
+                if (e.Row.Index % 2 == 1 && this.TryFindResource("AlternativeDataGridRowBackground", out object? alternateRowBrush) && alternateRowBrush is Avalonia.Media.IBrush brush)
+                {
+                    e.Row.Background = brush;
+                }
+            };
+            modGrid.ItemsSource = _viewModel.DataView;
             modGrid.LoadingRowGroup += ModGrid_LoadingRowGroup;
             modGrid.ColumnReordered += (sender, e) => { _viewModel.SetColumnOrder(modGrid); };
             modGrid.AddHandler(InputElement.LostFocusEvent, OnGridLostFocus, RoutingStrategies.Bubble);
@@ -165,7 +175,7 @@ namespace Stardrop.Views
             // Set profile list
             _editorView = new ProfileEditorViewModel(Pathing.GetProfilesFolderPath(), _viewModel.Mods.ToList());
             var profileComboBox = this.FindControl<ComboBox>("profileComboBox");
-            profileComboBox.Items = _editorView.Profiles;
+            profileComboBox.ItemsSource = _editorView.Profiles;
             profileComboBox.SelectedIndex = 0;
             if (_editorView.Profiles.FirstOrDefault(p => p.Name == Program.settings.LastSelectedProfileName) is Profile oldProfile && oldProfile is not null)
             {
@@ -245,10 +255,6 @@ namespace Stardrop.Views
 
             Program.helper.Log($"Initialization complete!");
 
-#if DEBUG
-            this.AttachDevTools();
-#endif
-
             if (Design.IsDesignMode)
             {
                 var testManifest = new Manifest() { Author = "Author", Name = "Test Mod", UniqueID = "Stardrop.TestMod", Version = "1.0.0" };
@@ -300,7 +306,7 @@ namespace Stardrop.Views
             else
             {
                 // Only grab search box if not currently typing in notes
-                var focusedElement = FocusManager.Instance?.Current;
+                var focusedElement = this.FocusManager?.GetFocusedElement();
                 if (focusedElement is not null && (focusedElement is not TextBox textBox || !textBox.Classes.Contains("notes")))
                 {
                     var searchBox = this.FindControl<TextBox>("searchBox");
@@ -337,7 +343,7 @@ namespace Stardrop.Views
             }
         }
 
-        private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        private void MainWindow_Closing(object? sender, WindowClosingEventArgs e)
         {
             Program.settings.LastSelectedProfileName = GetCurrentProfile().Name;
 
@@ -458,7 +464,7 @@ namespace Stardrop.Views
                 return;
             }
 
-            if (!e.Data.Contains(DataFormats.FileNames))
+            if (e.DataTransfer.Contains(DataFormat.File) is false)
             {
                 return;
             }
@@ -470,7 +476,8 @@ namespace Stardrop.Views
                 return;
             }
 
-            var addedMods = await AddMods(e.Data.GetFileNames()?.ToArray(), installTarget.InstallPathOverride);
+            var droppedPaths = e.DataTransfer.TryGetFiles()?.Select(file => file.TryGetLocalPath()).Where(path => String.IsNullOrEmpty(path) is false).Cast<string>().ToArray() ?? Array.Empty<string>();
+            var addedMods = await AddMods(droppedPaths, installTarget.InstallPathOverride);
 
             // TODO: Add optional setting to disable checking for updates when a new mod is installed?
             await CheckForModUpdates(addedMods, useCache: true, skipCacheCheck: true);
@@ -676,7 +683,7 @@ namespace Stardrop.Views
             {
                 originallySelectedModPaths.Add(selectedMod.Path);
             }
-            foreach (Mod mod in modGrid.Items)
+            foreach (Mod mod in modGrid.ItemsSource?.OfType<Mod>() ?? Enumerable.Empty<Mod>())
             {
                 if (originallySelectedModPaths.Contains(mod.Path))
                 {
@@ -1587,13 +1594,10 @@ namespace Stardrop.Views
                 return;
             }
 
-            OpenFileDialog dialog = new OpenFileDialog();
-            dialog.Filters.Add(new FileDialogFilter() { Name = "Mod Archive (*.zip, *.7z, *.rar)", Extensions = { "zip", "7z", "rar" } });
-            dialog.AllowMultiple = true;
+            var filePaths = await FilePickers.OpenFilesAsync(this, "Add Mods", true, new FilePickerFileType("Mod Archive (*.zip, *.7z, *.rar)") { Patterns = new[] { "*.zip", "*.7z", "*.rar" } });
 
             // Resolved after the files are chosen
-            var filePaths = await dialog.ShowAsync(this);
-            if (filePaths is null || filePaths.Length == 0)
+            if (filePaths is null || filePaths.Count == 0)
             {
                 return;
             }
@@ -1604,7 +1608,7 @@ namespace Stardrop.Views
                 return;
             }
 
-            var addedMods = await AddMods(filePaths, installTarget.InstallPathOverride);
+            var addedMods = await AddMods(filePaths.ToArray(), installTarget.InstallPathOverride);
 
             await CheckForModUpdates(addedMods, useCache: true, skipCacheCheck: true);
             await GetCachedModUpdates(_viewModel.Mods.ToList(), skipCacheCheck: true);

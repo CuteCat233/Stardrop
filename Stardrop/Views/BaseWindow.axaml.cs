@@ -9,9 +9,5 @@ public partial class BaseWindow : Window
     public BaseWindow()
     {
         AvaloniaXamlLoader.Load(this);
-
-#if DEBUG
-        this.AttachDevTools();
-#endif
     }
 }

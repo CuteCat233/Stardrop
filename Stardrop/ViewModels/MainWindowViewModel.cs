@@ -1,4 +1,4 @@
-﻿using Avalonia.Collections;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Json.More;
 using ReactiveUI;
@@ -27,8 +27,8 @@ namespace Stardrop.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        private string ChromeHint { get; set; } = "NoChrome";
-        private bool HasSystemDecorations { get; set; } = true;
+        private WindowDecorations _windowDecorations = Avalonia.Controls.WindowDecorations.BorderOnly;
+        public WindowDecorations WindowDecorations { get { return _windowDecorations; } set { this.RaiseAndSetIfChanged(ref _windowDecorations, value); } }
         private bool ShowTitle { get; set; } = true;
         private bool ShowMainMenu { get; set; } = true;
         private bool ShowWindowMenu { get; set; } = true;
@@ -132,13 +132,13 @@ namespace Stardrop.ViewModels
             // Do OS specific setup
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                ChromeHint = "Default";
+                WindowDecorations = Avalonia.Controls.WindowDecorations.Full;
                 ShowMainMenu = false;
                 ShowWindowMenu = false;
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                ChromeHint = "Default";
+                WindowDecorations = Avalonia.Controls.WindowDecorations.Full;
                 ShowWindowMenu = false;
                 ShowTitle = false;
             }

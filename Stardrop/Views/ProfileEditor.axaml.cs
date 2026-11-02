@@ -1,8 +1,9 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Stardrop.Models;
 using Stardrop.Models.Data.Enums;
+using Stardrop.Utilities;
 using Stardrop.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -24,10 +25,6 @@ namespace Stardrop.Views
         public ProfileEditor()
         {
             InitializeComponent();
-
-#if DEBUG
-            this.AttachDevTools();
-#endif
         }
 
         public ProfileEditor(ProfileEditorViewModel viewModel, Func<string, Task<List<Mod>>> addModDirectly, Func<Task>? refreshModList) : this()
@@ -36,9 +33,11 @@ namespace Stardrop.Views
             _addModDirectly = addModDirectly;
             _refreshModList = refreshModList;
 
+            this.Closing += ProfileEditor_Closing;
+
             // Load the profiles
             var profileListBox = this.FindControl<ListBox>("profileList");
-            profileListBox.Items = _viewModel.Profiles;
+            profileListBox.ItemsSource = _viewModel.Profiles;
             profileListBox.SelectedIndex = 0;
             profileListBox.SelectionChanged += ProfileListBox_SelectionChanged;
 
@@ -72,26 +71,12 @@ namespace Stardrop.Views
 
         private async void ImportButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
-            var dialog = new OpenFileDialog
-            {
-                Title = "Open Mod Profile",
-                AllowMultiple = false,
-                Filters = new List<FileDialogFilter>
-                {
-                    new FileDialogFilter
-                    {
-                        Name = "JSON files",
-                        Extensions = new List<string> { "json" }
-                    }
-                }
-            };
-
-            string[]? files = await dialog.ShowAsync(this);
-            if (files is not null && files.Length > 0)
+            var filePath = await FilePickers.OpenFileAsync(this, "Open Mod Profile", new Avalonia.Platform.Storage.FilePickerFileType("JSON files") { Patterns = new[] { "*.json" } });
+            if (String.IsNullOrEmpty(filePath) is false)
             {
                 try
                 {
-                    var externalProfile = JsonSerializer.Deserialize<ProfileExternal>(File.ReadAllText(files.First()), new JsonSerializerOptions { AllowTrailingCommas = true });
+                    var externalProfile = JsonSerializer.Deserialize<ProfileExternal>(File.ReadAllText(filePath), new JsonSerializerOptions { AllowTrailingCommas = true });
                     if (externalProfile is null)
                     {
                         Program.helper.Log($"Deserialized empty external profile during import");
@@ -262,15 +247,13 @@ namespace Stardrop.Views
         /// Anything short of applying discards the changes. Handled here rather than on the cancel button so that
         /// the exit button and the escape key behave the same way.
         /// </summary>
-        protected override void OnClosing(CancelEventArgs e)
+        private void ProfileEditor_Closing(object? sender, WindowClosingEventArgs e)
         {
             if (_hasAppliedChanges is false && _viewModel is not null)
             {
                 Program.helper.Log("Discarding unapplied profile editor changes");
                 _viewModel.RevertChanges();
             }
-
-            base.OnClosing(e);
         }
 
         private void MainBar_DoubleTapped(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

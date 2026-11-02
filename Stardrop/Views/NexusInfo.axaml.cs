@@ -15,9 +15,6 @@ namespace Stardrop.Views
         public NexusInfo()
         {
             InitializeComponent();
-#if DEBUG
-            this.AttachDevTools();
-#endif
         }
 
 

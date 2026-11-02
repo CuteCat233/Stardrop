@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Stardrop.Models;
+using Stardrop.Utilities;
 using Stardrop.ViewModels;
 using System.Collections.Generic;
 using System.IO;
@@ -36,17 +37,7 @@ namespace Stardrop.Views
                 return;
             }
 
-            var dialog = new SaveFileDialog
-            {
-                Title = "Export Profile",
-                InitialFileName = $"{_exportProfile.Name}.json",
-                Filters = new List<FileDialogFilter>
-                {
-                    new FileDialogFilter { Name = "JSON", Extensions = { "json" } }
-                }
-            };
-
-            string? path = await dialog.ShowAsync(this);
+            var path = await FilePickers.SaveFileAsync(this, "Export Profile", $"{_exportProfile.Name}.json", new Avalonia.Platform.Storage.FilePickerFileType("JSON") { Patterns = new[] { "*.json" } });
             if (path is not null)
             {
                 var externalProfile = new ProfileExternal() { Name = _exportProfile.Name, EnabledModIds = _exportProfile.EnabledModIds };

@@ -1,10 +1,7 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
-using Avalonia.ReactiveUI;
-using Avalonia.Shared.PlatformSupport;
 using CommandLine;
-using Projektanker.Icons.Avalonia;
-using Projektanker.Icons.Avalonia.MaterialDesign;
+using ReactiveUI;
 using Semver;
 using Stardrop.Models;
 using Stardrop.Models.Nexus;
@@ -29,7 +26,6 @@ namespace Stardrop
         internal static Helper helper;
         internal static Settings settings = new Settings();
         internal static Translation translation = new Translation();
-        internal static AssetLoader assetLoader = new AssetLoader();
 
         internal static bool onBootStartSMAPI = false;
         internal static string? nxmLink = null;
@@ -259,12 +255,14 @@ namespace Stardrop
                 Pathing.SetHomePath(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
             }
 
+            // Avalonia 12 no longer ships the Avalonia.ReactiveUI integration package, so wire the
+            // ReactiveUI schedulers to Avalonia's dispatcher ourselves.
+            RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
+            RxApp.TaskpoolScheduler = System.Reactive.Concurrency.TaskPoolScheduler.Default;
+
             return AppBuilder.Configure<App>()
-                .UseReactiveUI()
                 .UsePlatformDetect()
-                .LogToTrace()
-                .WithIcons(container => container
-                .Register<MaterialDesignIconProvider>());
+                .LogToTrace();
         }
     }
 }
