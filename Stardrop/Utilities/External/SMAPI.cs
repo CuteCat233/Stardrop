@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Stardrop.Utilities.External
@@ -19,7 +20,18 @@ namespace Stardrop.Utilities.External
     static class SMAPI
     {
         internal static bool IsRunning = false;
-        internal static Process Process;
+        internal static Process Process = null!;
+
+        private static readonly JsonSerializerOptions RequestOptions = new()
+        {
+            WriteIndented = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
+
+        private static readonly JsonSerializerOptions ResponseOptions = new()
+        {
+            PropertyNameCaseInsensitive = true
+        };
 
         public static ProcessStartInfo GetPrepareProcess(bool hideConsole)
         {
@@ -92,7 +104,7 @@ namespace Stardrop.Utilities.External
 
         public async static Task<List<ModEntry>> GetModUpdateData(GameDetails gameDetails, List<Mod> mods)
         {
-            List<ModSearchEntry> searchEntries = new List<ModSearchEntry>();
+            List<ModSearchEntry> searchEntries = [];
 
             // Mods installed by a collection are pinned to whatever version their collection asks for, so they are
             // never sent to smapi.io. Their requirements below are still sent, as those feed the mod key name cache
@@ -109,30 +121,34 @@ namespace Stardrop.Utilities.External
             }
 
             // Create the body to be sent via the POST request
-            ModSearchData searchData = new ModSearchData(searchEntries, gameDetails.SmapiVersion, gameDetails.GameVersion, gameDetails.System.ToString(), true);
+            ModSearchData searchData = new(searchEntries, gameDetails.SmapiVersion, gameDetails.GameVersion, gameDetails.System.ToString(), true);
 
             // Create a throwaway client
-            HttpClient client = new HttpClient();
+            HttpClient client = new();
             client.DefaultRequestHeaders.Add("Application-Name", "Stardrop");
             client.DefaultRequestHeaders.Add("Application-Version", Program.ApplicationVersion);
             client.DefaultRequestHeaders.Add("User-Agent", $"Stardrop/{Program.ApplicationVersion} {Environment.OSVersion}");
 
-            var parsedRequest = JsonSerializer.Serialize(searchData, new JsonSerializerOptions() { WriteIndented = true, IgnoreNullValues = true });
+            var parsedRequest = JsonSerializer.Serialize(searchData, RequestOptions);
             var requestPackage = new StringContent(parsedRequest, Encoding.UTF8, "application/json");
             var response = await client.PostAsync("https://smapi.io/api/v3.0/mods", requestPackage);
 
-            List<ModEntry> modUpdateData = new List<ModEntry>();
+            List<ModEntry> modUpdateData = [];
             if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content is not null)
             {
                 // In the name of the Nine Divines, why is JsonSerializer.Deserialize case sensitive by default???
                 string content = await response.Content.ReadAsStringAsync();
-                modUpdateData = JsonSerializer.Deserialize<List<ModEntry>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                List<ModEntry>? parsedData = JsonSerializer.Deserialize<List<ModEntry>>(content, ResponseOptions);
 
-                if (modUpdateData is null || modUpdateData.Count == 0)
+                if (parsedData is null || parsedData.Count == 0)
                 {
                     Program.helper.Log($"Mod update data was not parsable from smapi.io");
                     Program.helper.Log($"Response from smapi.io:\n{content}");
                     Program.helper.Log($"Our request to smapi.io:\n{parsedRequest}");
+                }
+                else
+                {
+                    modUpdateData = parsedData;
                 }
             }
             else
